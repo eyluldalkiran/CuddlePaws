@@ -4,7 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import { StyleSheet } from "react-native";
 
-export default function Category() {
+export default function Category({ category }) {
   const [data, setData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const GetCategories = async () => {
@@ -19,6 +19,7 @@ export default function Category() {
   }, []);
   const handleSelectedCategory = (item) => {
     setSelectedCategory(item.name);
+    category(item.name);
   };
   const renderItem = ({ item }) => {
     const isSelected = selectedCategory === item.name;
