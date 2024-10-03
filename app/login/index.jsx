@@ -56,17 +56,9 @@ export default function LoginScreen() {
         <Text style={styles.title}>to embrace your new friend?</Text>
       </View>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        {user ? (
-          <TouchableOpacity style={styles.button}>
-            <Link href="/home">
-              <Text style={styles.buttonText}>Get Started</Text>
-            </Link>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.button} onPress={onPress}>
-            <Text style={styles.buttonText}>Get Started</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity style={styles.button} onPress={onPress}>
+          <Text style={styles.buttonText}>Get Started</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
