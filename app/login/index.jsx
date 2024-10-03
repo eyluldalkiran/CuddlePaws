@@ -6,33 +6,37 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import { useOAuth } from "@clerk/clerk-expo";
+import { useOAuth, useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import React from "react";
 import { useCallback, useEffect } from "react";
 import { Link } from "expo-router";
+
 export const useWarmUpBrowser = () => {
   useEffect(() => {
-    // Warm up the android browser to improve UX
-    // https://docs.expo.dev/guides/authentication/#improving-user-experience
     void WebBrowser.warmUpAsync();
     return () => {
       void WebBrowser.coolDownAsync();
     };
   }, []);
 };
+
 WebBrowser.maybeCompleteAuthSession();
+
 export default function LoginScreen() {
   useWarmUpBrowser();
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+  const { user } = useUser();
   const onPress = useCallback(async () => {
     try {
-      const { createdSessionId, signIn, signUp } = await startOAuthFlow({
-        redirectUrl: Linking.createURL("/home", { scheme: "myapp" }),
-      });
+      const { createdSessionId, signIn, signUp, setActive } =
+        await startOAuthFlow({
+          redirectUrl: Linking.createURL("/home", { scheme: "myapp" }),
+        });
 
       if (createdSessionId) {
+        ({ session: createdSessionId });
       } else {
         // Use signIn or signUp for next steps such as MFA
       }
@@ -52,9 +56,17 @@ export default function LoginScreen() {
         <Text style={styles.title}>to embrace your new friend?</Text>
       </View>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.button} onPress={onPress}>
-          <Text style={styles.buttonText}>Get Started</Text>
-        </TouchableOpacity>
+        {user ? (
+          <TouchableOpacity style={styles.button}>
+            <Link href="/home">
+              <Text style={styles.buttonText}>Get Started</Text>
+            </Link>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={onPress}>
+            <Text style={styles.buttonText}>Get Started</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
