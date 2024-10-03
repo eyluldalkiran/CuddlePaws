@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   nameContainer: {
-    padding: 20,
+    padding: 10,
   },
   welcomeText: {
     fontSize: 20,
