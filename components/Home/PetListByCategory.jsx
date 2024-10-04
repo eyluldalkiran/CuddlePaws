@@ -1,8 +1,16 @@
-import { View, Text, Image, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
 import Category from "./Category";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
+import { useRouter } from "expo-router";
 
 export default function PetListByCategory() {
   const [data, setData] = useState([]);
@@ -12,13 +20,34 @@ export default function PetListByCategory() {
     setData(querySnapShot.docs.map((doc) => doc.data()));
     console.log(data);
   };
+  const router = useRouter();
+  const navigateToDetailScreen = (pet) => {
+    router.push({
+      pathname: "/pet_details",
+      params: pet,
+    });
+  };
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.petContainer}>
+      <TouchableOpacity
+        style={styles.petContainer}
+        onPress={() => navigateToDetailScreen(item)}
+      >
         <Image source={{ uri: item.imageUrl }} style={styles.image} />
-        <Text style={styles.text}>{item.name}</Text>
-        <Text style={styles.text}>Age: {item.age}</Text>
-      </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            marginTop: 10,
+          }}
+        >
+          <Text style={styles.text}>{item.name}</Text>
+          <View style={styles.ageContainer}>
+            <Text>{item.age} YRS</Text>
+          </View>
+        </View>
+        <Text>{item.location}</Text>
+      </TouchableOpacity>
     );
   };
   return (
@@ -40,18 +69,26 @@ const styles = StyleSheet.create({
   petContainer: {
     borderWidth: 0.2,
     margin: 10,
-    alignItems: "center",
     justifyContent: "center",
-    width: 250,
-    padding: 20,
+    padding: 10,
     borderRadius: 5,
   },
   image: {
-    width: 200,
+    width: 150,
     height: 150,
+    borderRadius: 5,
+    resizeMode: "stretch",
   },
   text: {
-    fontFamily: "outline-medium",
-    fontSize: 15,
+    fontFamily: "outfit-bold",
+    fontSize: 20,
+  },
+  ageContainer: {
+    backgroundColor: "#f8cfd0",
+    padding: 2,
+    margin: 3,
+    width: 80,
+    borderRadius: 5,
+    alignItems: "center",
   },
 });

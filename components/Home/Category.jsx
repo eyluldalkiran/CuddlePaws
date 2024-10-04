@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     margin: 5,
     width: 80,
-    backgroundColor: "#fda18b",
+    backgroundColor: "#f8cfd0",
   },
   categoryText: {
     fontSize: 13,
