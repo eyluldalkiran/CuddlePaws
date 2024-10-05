@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { TouchableOpacity } from "react-native";
@@ -6,6 +6,7 @@ import { useNavigation } from "expo-router";
 import PetInfoCard from "./PetInfoCard";
 import PetInfoCardContainer from "./PetInfoCardContainer";
 import { getPetAndOwner } from "../../services/getPetOwner";
+import TabButton from "./TabButton";
 
 export default function PetInfo({ pet }) {
   const [activeTab, setActiveTab] = useState("about");
@@ -23,32 +24,41 @@ export default function PetInfo({ pet }) {
 
     fetchPetOwner();
   }, []);
+  const renderAboutTab = () => {
+    return (
+      <View style={styles.aboutContainer}>
+        <Text style={styles.aboutTitle}>About {pet.name}</Text>
+        <Text style={styles.addressText}>{pet.about}</Text>
+      </View>
+    );
+  };
+  const renderContactTab = () =>
+    petOwner && (
+      <View style={styles.aboutContainer}>
+        <Text style={styles.aboutTitle}>Contact Information</Text>
+        <Text style={styles.addressText}>
+          Owner: {petOwner.name} {petOwner.surname}
+        </Text>
+        <Text style={styles.addressText}>Phone: {petOwner.phoneNumber}</Text>
+        <Text style={styles.addressText}>Email: {petOwner.email}</Text>
+        <TouchableOpacity style={styles.messageButton}>
+          <AntDesign name="mail" size={24} color="black" />
+          <Text style={styles.messageText}>Send Message</Text>
+        </TouchableOpacity>
+      </View>
+    );
   const renderContent = () => {
-    if (activeTab === "about") {
-      return (
-        <View style={styles.aboutContainer}>
-          <Text style={styles.aboutTitle}>About {pet.name}</Text>
-          <Text style={styles.addressText}>{pet.about}</Text>
-        </View>
-      );
-    } else if (activeTab === "contact") {
-      return (
-        <View style={styles.aboutContainer}>
-          <Text style={styles.aboutTitle}>Contact Information</Text>
-          <Text style={styles.addressText}>
-            Owner: {petOwner.name} {petOwner.surname}
-          </Text>
-          <Text style={styles.addressText}>Phone: {petOwner.phoneNumber}</Text>
-          <Text style={styles.addressText}>Email: {petOwner.email}</Text>
-          <TouchableOpacity>
-            <Text>Send Message</Text>
-          </TouchableOpacity>
-        </View>
-      );
+    switch (activeTab) {
+      case "about":
+        return renderAboutTab();
+      case "contact":
+        return renderContactTab();
+      default:
+        return renderAboutTab();
     }
   };
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Image source={{ uri: pet.imageUrl }} style={styles.image} />
       <TouchableOpacity
         style={styles.goBackIcon}
@@ -68,27 +78,19 @@ export default function PetInfo({ pet }) {
       </View>
       <PetInfoCardContainer pet={pet} />
       <View style={styles.tabSection}>
-        <TouchableOpacity onPress={() => setActiveTab("about")}>
-          <Text
-            style={
-              activeTab === "about" ? styles.activeTabText : styles.tabText
-            }
-          >
-            About
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setActiveTab("contact")}>
-          <Text
-            style={
-              activeTab === "contact" ? styles.activeTabText : styles.tabText
-            }
-          >
-            Contact
-          </Text>
-        </TouchableOpacity>
+        <TabButton
+          title="About"
+          onPress={() => setActiveTab("about")}
+          active={activeTab === "about"}
+        />
+        <TabButton
+          title="Contact"
+          onPress={() => setActiveTab("contact")}
+          active={activeTab === "contact"}
+        />
       </View>
       {renderContent()}
-    </View>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
@@ -147,5 +149,20 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 15,
     fontWeight: "bold",
+  },
+  messageButton: {
+    flexDirection: "row",
+    padding: 10,
+    margin: 10,
+    backgroundColor: "pink",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+  },
+  aboutTitle: {
+    fontSize: 20,
+    textAlign: "center",
+    fontFamily: "outfit",
+    marginBottom: 5,
   },
 });
