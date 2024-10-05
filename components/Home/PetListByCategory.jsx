@@ -17,7 +17,11 @@ export default function PetListByCategory() {
   const GetPetList = async (category) => {
     const q = query(collection(db, "Pets"), where("category", "==", category));
     const querySnapShot = await getDocs(q);
-    setData(querySnapShot.docs.map((doc) => doc.data()));
+    const petsWithId = querySnapShot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setData(petsWithId);
     console.log(data);
   };
   const router = useRouter();
