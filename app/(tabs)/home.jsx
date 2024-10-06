@@ -12,14 +12,23 @@ import PetListByCategory from "../../components/Home/PetListByCategory";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FlatList } from "react-native";
+import { router } from "expo-router";
 export default function HomeScreen() {
+  const navigateToCreateScreen = () => {
+    router.push({
+      pathname: "/create_pet",
+    });
+  };
   const renderContent = () => (
     <>
       <Header />
       <Slider />
       <PetListByCategory />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.addPetButton}>
+        <TouchableOpacity
+          style={styles.addPetButton}
+          onPress={() => navigateToCreateScreen()}
+        >
           <MaterialIcons name="pets" size={24} color="black" />
           <Text style={styles.textButton}>Add New Pet</Text>
         </TouchableOpacity>

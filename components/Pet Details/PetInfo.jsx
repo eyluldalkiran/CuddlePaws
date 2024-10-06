@@ -3,11 +3,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "expo-router";
-import PetInfoCard from "./PetInfoCard";
 import PetInfoCardContainer from "./PetInfoCardContainer";
 import { getPetAndOwner } from "../../services/getPetOwner";
 import TabButton from "./TabButton";
-import { UseDispatch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleFavorites } from "../../redux/slices/favoriteSlice";
 export default function PetInfo({ pet }) {
   const [activeTab, setActiveTab] = useState(null);
@@ -25,6 +24,7 @@ export default function PetInfo({ pet }) {
 
     fetchPetOwner();
   }, []);
+  console.log("PET", pet);
   // const renderAboutTab = () => {
   //   return (
   //     <View style={styles.aboutContainer}>
