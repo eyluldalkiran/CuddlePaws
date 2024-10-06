@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "expo-router";
@@ -7,11 +7,12 @@ import PetInfoCard from "./PetInfoCard";
 import PetInfoCardContainer from "./PetInfoCardContainer";
 import { getPetAndOwner } from "../../services/getPetOwner";
 import TabButton from "./TabButton";
-
+import { UseDispatch, useDispatch, useSelector } from "react-redux";
+import { toggleFavorites } from "../../redux/slices/favoriteSlice";
 export default function PetInfo({ pet }) {
-  const [activeTab, setActiveTab] = useState("about");
+  const [activeTab, setActiveTab] = useState(null);
   const navigation = useNavigation();
-  const [petOwner, setPetOwner] = useState("");
+  const [petOwner, setPetOwner] = useState(null);
   useEffect(() => {
     const fetchPetOwner = async () => {
       try {
@@ -24,39 +25,46 @@ export default function PetInfo({ pet }) {
 
     fetchPetOwner();
   }, []);
-  const renderAboutTab = () => {
-    return (
-      <View style={styles.aboutContainer}>
-        <Text style={styles.aboutTitle}>About {pet.name}</Text>
-        <Text style={styles.addressText}>{pet.about}</Text>
-      </View>
-    );
+  // const renderAboutTab = () => {
+  //   return (
+  //     <View style={styles.aboutContainer}>
+  //       <Text style={styles.aboutTitle}>About {pet.name}</Text>
+  //       <Text style={styles.addressText}>{pet.about}</Text>
+  //     </View>
+  //   );
+  // };
+  // const renderContactTab = () =>
+  //   petOwner && (
+  //     <View style={styles.aboutContainer}>
+  //       <Text style={styles.aboutTitle}>Contact Information</Text>
+  //       <Text style={styles.addressText}>
+  //         Owner: {petOwner.name} {petOwner.surname}
+  //       </Text>
+  //       <Text style={styles.addressText}>Phone: {petOwner.phoneNumber}</Text>
+  //       <Text style={styles.addressText}>Email: {petOwner.email}</Text>
+  //       <TouchableOpacity style={styles.messageButton}>
+  //         <AntDesign name="mail" size={24} color="black" />
+  //         <Text style={styles.messageText}>Send Message</Text>
+  //       </TouchableOpacity>
+  //     </View>
+  //   );
+  // const renderContent = useMemo(() => {
+  //   switch (activeTab) {
+  //     case "about":
+  //       return renderAboutTab();
+  //     case "contact":
+  //       return renderContactTab();
+  //     default:
+  //       return null;
+  //   }
+  // }, [activeTab, petOwner]);
+  const dispatch = useDispatch();
+  const favoritePets = useSelector((state) => state.favorites.favoritePets);
+
+  const toggleFavorite = (petId) => {
+    dispatch(toggleFavorites(petId));
   };
-  const renderContactTab = () =>
-    petOwner && (
-      <View style={styles.aboutContainer}>
-        <Text style={styles.aboutTitle}>Contact Information</Text>
-        <Text style={styles.addressText}>
-          Owner: {petOwner.name} {petOwner.surname}
-        </Text>
-        <Text style={styles.addressText}>Phone: {petOwner.phoneNumber}</Text>
-        <Text style={styles.addressText}>Email: {petOwner.email}</Text>
-        <TouchableOpacity style={styles.messageButton}>
-          <AntDesign name="mail" size={24} color="black" />
-          <Text style={styles.messageText}>Send Message</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  const renderContent = () => {
-    switch (activeTab) {
-      case "about":
-        return renderAboutTab();
-      case "contact":
-        return renderContactTab();
-      default:
-        return renderAboutTab();
-    }
-  };
+  const isFavorite = favoritePets.includes(pet.id);
   return (
     <ScrollView style={styles.container}>
       <Image source={{ uri: pet.imageUrl }} style={styles.image} />
@@ -72,8 +80,15 @@ export default function PetInfo({ pet }) {
           <Text style={styles.nameText}>{pet.name}</Text>
           <Text style={styles.addressText}>{pet.location}</Text>
         </View>
-        <TouchableOpacity style={styles.favoriteButton}>
-          <AntDesign name="hearto" size={30} color="black" />
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={() => toggleFavorite(pet.id)}
+        >
+          <AntDesign
+            name={isFavorite ? "heart" : "hearto"}
+            size={24}
+            color={isFavorite ? "red" : "black"}
+          />
         </TouchableOpacity>
       </View>
       <PetInfoCardContainer pet={pet} />
@@ -89,7 +104,7 @@ export default function PetInfo({ pet }) {
           active={activeTab === "contact"}
         />
       </View>
-      {renderContent()}
+      {/* {renderContent} */}
     </ScrollView>
   );
 }
@@ -99,7 +114,7 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 300,
-
+    width: "100%",
     borderRadius: 5,
   },
   infoContainer: {
