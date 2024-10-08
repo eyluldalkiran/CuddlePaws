@@ -34,6 +34,13 @@ export default function CreatePet() {
     { label: "Female", value: "Female" },
     { label: "Male", value: "Male" },
   ]);
+  const [address, setAddress] = useState({
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
+  });
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
@@ -89,6 +96,12 @@ export default function CreatePet() {
       setImageUrl(result.assets[0].uri);
     }
   };
+  const handleAddressChange = (name, value) => {
+    setAddress((prevAddress) => ({
+      ...prevAddress,
+      [name]: value,
+    }));
+  };
 
   const addPet = async () => {
     const petData = {
@@ -101,6 +114,7 @@ export default function CreatePet() {
       weight: weight,
       userID: user.id,
       imageUrl: imageUrl,
+      address: address,
     };
     try {
       addDoc(collection(db, "Pets"), petData);
@@ -172,10 +186,38 @@ export default function CreatePet() {
           <Text>Upload Image</Text>
           <AntDesign name="camera" size={24} color="black" />
         </TouchableOpacity>
+        {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />}
+        <View>
+          <Text>Address</Text>
+          <Input
+            placeholder="Street"
+            value={address.street}
+            onChangeText={(text) => handleAddressChange("street", text)}
+          />
+          <Input
+            placeholder="City"
+            value={address.city}
+            onChangeText={(text) => handleAddressChange("city", text)}
+          />
+          <Input
+            placeholder="State"
+            value={address.state}
+            onChangeText={(text) => handleAddressChange("state", text)}
+          />
+          <Input
+            placeholder="Zip"
+            value={address.zip}
+            onChangeText={(text) => handleAddressChange("zip", text)}
+          />
+          <Input
+            placeholder="Country"
+            value={address.country}
+            onChangeText={(text) => handleAddressChange("country", text)}
+          />
+        </View>
         <TouchableOpacity style={styles.button} onPress={() => addPet()}>
           <Text>Add Pet</Text>
         </TouchableOpacity>
-        {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />}
       </View>
     );
   };
