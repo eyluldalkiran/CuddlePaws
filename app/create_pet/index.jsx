@@ -8,6 +8,8 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  FlatList,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
@@ -26,6 +28,7 @@ export default function CreatePet() {
   const [about, setAbout] = useState("");
   const [category, setCategory] = useState("");
   const [breed, setBreed] = useState("");
+  const [weight, setWeight] = useState("");
   const [categories, setCategories] = useState([]);
   const [genders, setGenders] = useState([
     { label: "Female", value: "Female" },
@@ -34,7 +37,8 @@ export default function CreatePet() {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [openCategory, setOpenCategory] = useState(false);
+  const [openGender, setOpenGender] = useState(false);
   const { user } = useUser();
 
   const GetCategories = async () => {
@@ -94,71 +98,95 @@ export default function CreatePet() {
       age: age,
       category: category,
       sex: gender,
+      weight: weight,
       userID: user.id,
       imageUrl: imageUrl,
     };
     try {
       addDoc(collection(db, "Pets"), petData);
-      console.log("Successfuly created pet!");
+      Alert.alert("Success!", "Successfuly added pet!", [
+        {
+          text: "Ok",
+          onPress: () => navigation.goBack(),
+          style: "cancel",
+        },
+      ]);
     } catch (error) {
       console.error("Error creating pet ", error);
     }
   };
-  return (
-    <ScrollView style={styles.container}>
+  const renderContent = () => {
+    return (
       <View>
-        <Image
-          source={require("../../assets/images/addpet.jpg")}
-          style={styles.image}
-        />
-        <Text style={styles.title}>Add New Pet</Text>
-      </View>
-      <Input placeholder="Name" value={name} onChangeText={setName} />
-      <Input placeholder="Age" value={age} onChangeText={setAge} />
+        <View>
+          <Image
+            source={require("../../assets/images/addpet.jpg")}
+            style={styles.image}
+          />
+          <TouchableOpacity
+            style={styles.goBackIcon}
+            onPress={() => navigation.goBack()}
+          >
+            <AntDesign name="arrowleft" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Add New Pet</Text>
+        </View>
+        <Input placeholder="Name" value={name} onChangeText={setName} />
+        <Input placeholder="Age" value={age} onChangeText={setAge} />
 
-      <Input placeholder="Breed" value={breed} onChangeText={setBreed} />
-      <Input placeholder="Gender" value={gender} onChangeText={setGender} />
-      <TextInput
-        style={styles.aboutBox}
-        value={about}
-        onChangeText={setAbout}
-        placeholder="About..."
-        multiline={true}
-        numberOfLines={4}
-        textAlignVertical="top"
+        <Input placeholder="Breed" value={breed} onChangeText={setBreed} />
+        <Input placeholder="Weight" value={weight} onChangeText={setWeight} />
+        <TextInput
+          style={styles.aboutBox}
+          value={about}
+          onChangeText={setAbout}
+          placeholder="About..."
+          multiline={true}
+          numberOfLines={4}
+          textAlignVertical="top"
+        />
+        <DropDownPicker
+          open={openCategory}
+          value={category}
+          items={categories}
+          setOpen={setOpenCategory}
+          setValue={setCategory}
+          setItems={setCategories}
+          placeholder="Select Category"
+          style={styles.dropDown}
+        />
+        <DropDownPicker
+          open={openGender}
+          value={gender}
+          items={genders}
+          setOpen={setOpenGender}
+          setValue={setGender}
+          setItems={setGenders}
+          placeholder="Select Gender"
+          style={styles.dropDown}
+        />
+        <TouchableOpacity
+          style={styles.uploadButton}
+          onPress={() => uploadImage()}
+        >
+          <Text>Upload Image</Text>
+          <AntDesign name="camera" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => addPet()}>
+          <Text>Add Pet</Text>
+        </TouchableOpacity>
+        {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />}
+      </View>
+    );
+  };
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={[" "]}
+        renderItem={renderContent}
+        keyExtractor={(item, index) => index.toString()}
       />
-      <DropDownPicker
-        open={open}
-        value={category}
-        items={categories}
-        setOpen={setOpen}
-        setValue={setCategory}
-        setItems={setCategories}
-        placeholder="Select Category"
-        style={styles.dropDown}
-      />
-      <DropDownPicker
-        open={open}
-        value={gender}
-        items={genders}
-        setOpen={setOpen}
-        setValue={setGender}
-        setItems={setGenders}
-        placeholder="Select Category"
-        style={styles.dropDown}
-      />
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() => uploadImage()}
-      >
-        <Text>Upload Image</Text>
-        <AntDesign name="camera" size={24} color="black" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => addPet()}>
-        <Text>Add Pet</Text>
-      </TouchableOpacity>
-      {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />}
-    </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -212,5 +240,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 0.2,
     width: "%100",
+  },
+  goBackIcon: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    backgroundColor: "gray",
+    borderRadius: 999,
+    padding: 3,
   },
 });
