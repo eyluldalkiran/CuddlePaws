@@ -60,11 +60,11 @@ export default function PetInfo({ pet }) {
   // }, [activeTab, petOwner]);
   const dispatch = useDispatch();
   const favoritePets = useSelector((state) => state.favorites.favoritePets);
-
-  const toggleFavorite = (petId) => {
-    dispatch(toggleFavorites(petId));
+  const isFavorite = favoritePets.map((item) => item.id).includes(pet.id);
+  const toggleFavorite = (pet) => {
+    dispatch(toggleFavorites(pet));
   };
-  const isFavorite = favoritePets.includes(pet.id);
+
   return (
     <ScrollView style={styles.container}>
       <Image source={{ uri: pet.imageUrl }} style={styles.image} />
@@ -82,7 +82,7 @@ export default function PetInfo({ pet }) {
         </View>
         <TouchableOpacity
           style={styles.favoriteButton}
-          onPress={() => toggleFavorite(pet.id)}
+          onPress={() => toggleFavorite(pet)}
         >
           <AntDesign
             name={isFavorite ? "heart" : "hearto"}

@@ -2,8 +2,9 @@ import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
-import { store } from "../redux/store";
+import { persistor, store } from "../redux/store";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 const tokenCache = {
   async getToken(key) {
     try {
@@ -38,25 +39,27 @@ export default function RootLayout() {
   });
   return (
     <Provider store={store}>
-      <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-        <ClerkLoaded>
-          <Stack>
-            <Stack.Screen name="index" />
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="login/index"
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack>
-        </ClerkLoaded>
-      </ClerkProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+          <ClerkLoaded>
+            <Stack>
+              <Stack.Screen name="index" />
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="login/index"
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </Stack>
+          </ClerkLoaded>
+        </ClerkProvider>
+      </PersistGate>
     </Provider>
   );
 }
